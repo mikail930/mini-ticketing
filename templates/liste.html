@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block contenu %}
+<nav class="compteurs" aria-label="Filtrer par statut">
+  <a href="{{ url_for('liste') }}" class="{{ 'actif' if statut == 'actifs' }}">
+    <strong>{{ compteurs.values() | sum - compteurs['Résolu'] }}</strong> À traiter</a>
+  {% for s in statuts %}
+  <a href="{{ url_for('liste', statut=s) }}" class="{{ 'actif' if statut == s }}">
+    <strong>{{ compteurs[s] }}</strong> {{ s }}</a>
+  {% endfor %}
+  <a href="{{ url_for('liste', statut='tous') }}" class="{{ 'actif' if statut == 'tous' }}">
+    <strong>{{ compteurs.values() | sum }}</strong> Tous</a>
+</nav>
+
+<form class="filtres" method="get">
+  <input type="hidden" name="statut" value="{{ statut }}">
+  <label class="invisible" for="q">Rechercher</label>
+  <input id="q" type="search" name="q" value="{{ recherche }}" placeholder="Titre, demandeur ou poste">
+  <label class="invisible" for="priorite">Priorité</label>
+  <select id="priorite" name="priorite">
+    <option value="">Toutes priorités</option>
+    {% for p in priorites %}<option {{ 'selected' if p == priorite }}>{{ p }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filtrer</button>
+</form>
+
+{% if tickets %}
+<ul class="tickets">
+  {% for t in tickets %}
+  <li class="p-{{ t.priorite | lower }}">
+    <a href="{{ url_for('detail', ticket_id=t.id) }}">
+      <span class="numero">#{{ '%04d' % t.id }}</span>
+      <span class="titre">{{ t.titre }}</span>
+      <span class="infos">{{ t.demandeur }}{% if t.poste %} · {{ t.poste }}{% endif %} · {{ t.categorie }} · {{ t.cree_le }}</span>
+      <span class="etiquettes">
+        <span class="priorite">{{ t.priorite }}</span>
+        <span class="statut">{{ t.statut }}</span>
+      </span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="vide">Aucun ticket ne correspond. <a href="{{ url_for('nouveau') }}">Créer un ticket</a></p>
+{% endif %}
+{% endblock %}

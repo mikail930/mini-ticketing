@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titre %}Nouveau ticket{% endblock %}
+{% block contenu %}
+<h1>Nouveau ticket</h1>
+<form class="fiche" method="post">
+  <input type="hidden" name="jeton" value="{{ jeton() }}">
+
+  <label for="titre">Titre</label>
+  <input id="titre" name="titre" maxlength="120" required value="{{ f.titre or '' }}"
+         placeholder="Ex. : l'imprimante de l'accueil n'imprime plus">
+
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="6" required
+            placeholder="Que se passe-t-il ? Depuis quand ? Message d'erreur affiché ?">{{ f.description or '' }}</textarea>
+
+  <div class="deux">
+    <div>
+      <label for="demandeur">Demandeur</label>
+      <input id="demandeur" name="demandeur" maxlength="60" required value="{{ f.demandeur or '' }}">
+    </div>
+    <div>
+      <label for="poste">Poste concerné <small>(facultatif)</small></label>
+      <input id="poste" name="poste" maxlength="40" value="{{ f.poste or '' }}" placeholder="PC-ACCUEIL-02">
+    </div>
+    <div>
+      <label for="categorie">Catégorie</label>
+      <select id="categorie" name="categorie">
+        {% for c in categories %}<option {{ 'selected' if c == f.categorie }}>{{ c }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="priorite">Priorité</label>
+      <select id="priorite" name="priorite">
+        {% for p in priorites %}<option {{ 'selected' if p == f.priorite }}>{{ p }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="submit" class="bouton">Créer le ticket</button>
+    <a href="{{ url_for('liste') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

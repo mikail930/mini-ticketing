@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block titre %}#{{ '%04d' % t.id }} {{ t.titre }}{% endblock %}
+{% block contenu %}
+<p class="retour"><a href="{{ url_for('liste') }}">← Tous les tickets</a></p>
+
+<article class="ticket p-{{ t.priorite | lower }}">
+  <p class="numero">#{{ '%04d' % t.id }}</p>
+  <h1>{{ t.titre }}</h1>
+  <p class="etiquettes">
+    <span class="priorite">{{ t.priorite }}</span>
+    <span class="statut">{{ t.statut }}</span>
+  </p>
+  <dl>
+    <dt>Demandeur</dt><dd>{{ t.demandeur }}</dd>
+    <dt>Poste</dt><dd>{{ t.poste or '—' }}</dd>
+    <dt>Catégorie</dt><dd>{{ t.categorie }}</dd>
+    <dt>Créé le</dt><dd>{{ t.cree_le }}</dd>
+    {% if t.resolu_le %}<dt>Résolu le</dt><dd>{{ t.resolu_le }}</dd>{% endif %}
+  </dl>
+  <p class="description">{{ t.description }}</p>
+</article>
+
+<section>
+  <h2>Suivi</h2>
+  {% if notes %}
+  <ol class="notes">
+    {% for n in notes %}
+    <li>
+      <p class="entete"><strong>{{ n.auteur }}</strong> <time>{{ n.cree_le }}</time></p>
+      <p class="texte">{{ n.texte }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="vide">Aucune intervention pour l'instant.</p>
+  {% endif %}
+
+  <form class="fiche" method="post" action="{{ url_for('suivi', ticket_id=t.id) }}">
+    <input type="hidden" name="jeton" value="{{ jeton() }}">
+    <div class="deux">
+      <div>
+        <label for="statut">Statut</label>
+        <select id="statut" name="statut">
+          {% for s in statuts %}<option {{ 'selected' if s == t.statut }}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="priorite">Priorité</label>
+        <select id="priorite" name="priorite">
+          {% for p in priorites %}<option {{ 'selected' if p == t.priorite }}>{{ p }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <label for="auteur">Votre nom</label>
+    <input id="auteur" name="auteur" maxlength="60">
+    <label for="texte">Note d'intervention</label>
+    <textarea id="texte" name="texte" rows="4"
+              placeholder="Ce qui a été vérifié, ce qui a été fait, ce qu'il reste à faire"></textarea>
+    <div class="actions">
+      <button type="submit" class="bouton">Enregistrer</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
